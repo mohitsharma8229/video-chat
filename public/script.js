@@ -7,6 +7,24 @@ var peer = new Peer(undefined, {
 });
 
 const user = prompt("Enter your name");
+const myVideo=document.createElement("video")
+myVideo.muted=true
+let myStream
+navigator.mediaDevices.getUserMedia({
+    audio:true,
+    video:true,
+})
+.then((stream)=>{
+    myStream=stream
+    addVideoStream(myVideo,stream)
+})
+function addVideoStream(video,stream){
+    video.srcObject=stream
+    video.addEventListener("loadedmetadata",()=>{
+        video.play()
+        $("#video_grid").append(video)
+    })
+}
 
 $(function () {
     $("#show_chat").click(function () {
@@ -19,21 +37,18 @@ $(function () {
         $(".right-window").css("display", "none")
         $(".header_back").css("display", "none")
     })
-
     $("#send").click(function () {
         if ($("#chat_message").val().length !== 0) {
             socket.emit("message", $("#chat_message").val());
             $("#chat_message").val("");
         }
     })
-
     $("#chat_message").keydown(function (e) {
         if (e.key == "Enter" && $("#chat_message").val().length !== 0) {
             socket.emit("message", $("#chat_message").val());
             $("#chat_message").val("");
         }
     })
-
 })
 
 peer.on("open", (id) => {
